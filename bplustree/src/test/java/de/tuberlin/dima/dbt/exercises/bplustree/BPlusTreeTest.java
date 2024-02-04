@@ -679,7 +679,7 @@ public class BPlusTreeTest {
                                                         )
                                                 ),
                                                 newNode(
-                                                        keys(9, 11, 17, 19),
+                                                        keys(9, 12, 17, 19),
                                                         nodes(
                                                                 newLeaf(keys(7, 8), values("g", "h")),
                                                                 newLeaf(keys(9, 11), values("i", "k")),
@@ -704,7 +704,153 @@ public class BPlusTreeTest {
                                                 newNode(
                                                         keys(31, 33, 35),
                                                         nodes(
-                                                                newLeaf(keys(27, 28, 29, 30), values("aa", "ab")),
+                                                                newLeaf(keys(27, 28, 29, 30), values("aa", "ab", "ba", "bb")),
+                                                                newLeaf(keys(31, 32), values("ac", "ad")),
+                                                                newLeaf(keys(33, 34), values("ae", "af")),
+                                                                newLeaf(keys(35, 36), values("ag", "ah"))
+                                                        )
+                                                ),
+                                                newNode(
+                                                        keys(39, 41),
+                                                        nodes(
+                                                                newLeaf(keys(37, 38), values("ai", "aj")),
+                                                                newLeaf(keys(39, 40), values("ak", "al")),
+                                                                newLeaf(keys(41, 42), values("am", "an"))
+                                                        )
+                                                ),
+                                                newNode(
+                                                        keys(45, 47),
+                                                        nodes(
+                                                                newLeaf(keys(43, 44), values("ao", "ap")),
+                                                                newLeaf(keys(45, 46), values("aq", "ar")),
+                                                                newLeaf(keys(47, 48), values("as", "at"))
+
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
+
+        )));
+    }
+
+    @Test
+    public void deleteFromChildMergeWithRightSibblingAndStealFromRightUpperSibbling() {
+        // given
+        tree = newTree(
+                newNode(
+                        keys(27),
+                        nodes(
+                                newNode(
+                                        keys(9, 21),
+                                        nodes(
+                                                newNode(
+                                                        keys(3, 5),
+                                                        nodes(
+                                                                newLeaf(keys(1, 2), values("a", "b")),
+                                                                newLeaf(keys(3, 4), values("c", "d")),
+                                                                newLeaf(keys(5, 6), values("e", "f"))
+                                                        )
+                                                ),
+                                                newNode(
+                                                        keys(9, 11, 17, 19),
+                                                        nodes(
+                                                                newLeaf(keys(7, 8), values("g", "h")),
+                                                                newLeaf(keys(9, 10), values("i", "j")),
+                                                                newLeaf(keys(11, 12, 13, 14), values("k", "l", "m", "n")),
+                                                                newLeaf(keys(17, 18), values("q", "r")),
+                                                                newLeaf(keys(19, 20), values("s", "t"))
+                                                        )
+                                                ),
+                                                newNode(
+                                                        keys(21, 23),
+                                                        nodes(
+                                                                newLeaf(keys(21, 22), values("u", "v")),
+                                                                newLeaf(keys(23, 24), values("w", "x")),
+                                                                newLeaf(keys(25, 26), values("y", "z"))
+                                                        )
+                                                )
+                                        )
+                                ),
+                                newNode(
+                                        keys(37, 45),
+                                        nodes(
+                                                newNode(
+                                                        keys(31, 33, 35),
+                                                        nodes(
+                                                                newLeaf(keys(27, 28, 29, 30), values("aa", "ab", "ba", "bb")),
+                                                                newLeaf(keys(31, 32), values("ac", "ad")),
+                                                                newLeaf(keys(33, 34), values("ae", "af")),
+                                                                newLeaf(keys(35, 36), values("ag", "ah"))
+                                                        )
+                                                ),
+                                                newNode(
+                                                        keys(39, 41),
+                                                        nodes(
+                                                                newLeaf(keys(37, 38), values("ai", "aj")),
+                                                                newLeaf(keys(39, 40), values("ak", "al")),
+                                                                newLeaf(keys(41, 42), values("am", "an"))
+                                                        )
+                                                ),
+                                                newNode(
+                                                        keys(45, 47),
+                                                        nodes(
+                                                                newLeaf(keys(43, 44), values("ao", "ap")),
+                                                                newLeaf(keys(45, 46), values("aq", "ar")),
+                                                                newLeaf(keys(47, 48), values("as", "at"))
+
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
+        );
+        // when
+        tree.delete(1);
+        // then
+        assertThat(tree, isTree(newTree(
+                newNode(
+                        keys(27),
+                        nodes(
+                                newNode(
+                                        keys(9, 21),
+                                        nodes(
+                                                newNode(
+                                                        keys(5, 7),
+                                                        nodes(
+                                                                newLeaf(keys(2, 3, 4), values("b", "c", "d")),
+                                                                newLeaf(keys(5, 6), values("e", "f")),
+                                                                newLeaf(keys(7, 8), values("g", "h"))
+                                                        )
+                                                ),
+                                                newNode(
+                                                        keys(11, 17, 19),
+                                                        nodes(
+                                                                newLeaf(keys(9, 10), values("i", "j")),
+                                                                newLeaf(keys(11, 12, 13, 14), values("k", "l", "m", "n")),
+                                                                newLeaf(keys(17, 18), values("q", "r")),
+                                                                newLeaf(keys(19, 20), values("s", "t"))
+                                                        )
+                                                ),
+                                                newNode(
+                                                        keys(21, 23),
+                                                        nodes(
+                                                                newLeaf(keys(21, 22), values("u", "v")),
+                                                                newLeaf(keys(23, 24), values("w", "x")),
+                                                                newLeaf(keys(25, 26), values("y", "z"))
+                                                        )
+                                                )
+                                        )
+                                ),
+                                newNode(
+                                        keys(37, 45),
+                                        nodes(
+                                                newNode(
+                                                        keys(31, 33, 35),
+                                                        nodes(
+                                                                newLeaf(keys(27, 28, 29, 30), values("aa", "ab", "ba", "bb")),
                                                                 newLeaf(keys(31, 32), values("ac", "ad")),
                                                                 newLeaf(keys(33, 34), values("ae", "af")),
                                                                 newLeaf(keys(35, 36), values("ag", "ah"))
