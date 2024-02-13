@@ -1005,6 +1005,20 @@ public class BPlusTreeTest {
     }
 
     @Test
+    public void deleteFromChildMergeWithSibblingOnlyRoot() {
+        // given
+        tree = newTree(newNode(
+                keys(4), nodes(newLeaf(keys(1, 2), values("a", "b")),
+                        newLeaf(keys(4, 5), values("d", "e")))));
+        // when
+        String value = tree.delete(2);
+        // then
+        assertThat(value, is("b"));
+        assertThat(tree, isTree(newTree(newLeaf(
+                keys(1, 4, 5), values("a", "d", "e")))));
+    }
+
+    @Test
     public void fabsdeleteFromChildMergeWithSibling() {
         // given
         tree = newTree(newNode(keys(3, 5),
@@ -1021,24 +1035,25 @@ public class BPlusTreeTest {
     }
 
     @Test
-    public void bigdeleteFromChildMergeWithSibling() {
+    public void bigdeleteFromChildMergeWithRightSibling() {
         // given
         tree = newTree(
                 newNode(
                         keys(12),
                         nodes(
                                 newNode(
-                                        keys(4, 6),
+                                        keys(4, 6, 8),
                                         nodes(
                                                 newLeaf(keys(1, 2), values("a", "b")),
                                                 newLeaf(keys(4, 5), values("d", "e")),
-                                                newLeaf(keys(6, 7), values("f", "g"))
+                                                newLeaf(keys(6, 7), values("f", "g")),
+                                                newLeaf(keys(8, 9), values("h", "i"))
                                         )
                                 ),
                                 newNode(
                                         keys(12, 16),
                                         nodes(
-                                                newLeaf(keys(9, 10, 11), values("i", "j", "k")),
+                                                newLeaf(keys(10, 11), values("j", "k")),
                                                 newLeaf(keys(12, 13, 14, 15), values("l", "m", "n", "o")),
                                                 newLeaf(keys(16, 17), values("p", "q"))
                                         )
@@ -1056,16 +1071,77 @@ public class BPlusTreeTest {
                                         keys(12),
                                         nodes(
                                                 newNode(
-                                                        keys(4),
+                                                        keys(4, 8),
                                                         nodes(
                                                                 newLeaf(keys(1, 2), values("a", "b")),
-                                                                newLeaf(keys(4, 6, 7), values("d", "f", "g"))
+                                                                newLeaf(keys(4, 6, 7), values("d", "f", "g")),
+                                                                newLeaf(keys(8, 9), values("h", "i"))
                                                         )
                                                 ),
                                                 newNode(
                                                         keys(12, 16),
                                                         nodes(
-                                                                newLeaf(keys(9, 10, 11), values("i", "j", "k")),
+                                                                newLeaf(keys(10, 11), values("j", "k")),
+                                                                newLeaf(keys(12, 13, 14, 15), values("l", "m", "n", "o")),
+                                                                newLeaf(keys(16, 17), values("p", "q"))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
+        );
+
+    }
+
+    @Test
+    public void bigdeleteFromChildMergeWithLeftSibling() {
+        // given
+        tree = newTree(
+                newNode(
+                        keys(12),
+                        nodes(
+                                newNode(
+                                        keys(4, 6, 8),
+                                        nodes(
+                                                newLeaf(keys(1, 2), values("a", "b")),
+                                                newLeaf(keys(4, 5), values("d", "e")),
+                                                newLeaf(keys(6, 7), values("f", "g")),
+                                                newLeaf(keys(8, 9), values("h", "i"))
+                                        )
+                                ),
+                                newNode(
+                                        keys(12, 16),
+                                        nodes(
+                                                newLeaf(keys(10, 11), values("j", "k")),
+                                                newLeaf(keys(12, 13, 14, 15), values("l", "m", "n", "o")),
+                                                newLeaf(keys(16, 17), values("p", "q"))
+                                        )
+                                )
+                        )
+                )
+        );
+        // when
+        String value = tree.delete(9);
+        // then
+        assertThat(value, is("i"));
+        assertThat(tree, isTree(
+                        newTree(
+                                newNode(
+                                        keys(12),
+                                        nodes(
+                                                newNode(
+                                                        keys(4, 6),
+                                                        nodes(
+                                                                newLeaf(keys(1, 2), values("a", "b")),
+                                                                newLeaf(keys(4, 5), values("d", "e")),
+                                                                newLeaf(keys(6, 7, 8), values("f", "g", "h"))
+                                                        )
+                                                ),
+                                                newNode(
+                                                        keys(12, 16),
+                                                        nodes(
+                                                                newLeaf(keys(10, 11), values("j", "k")),
                                                                 newLeaf(keys(12, 13, 14, 15), values("l", "m", "n", "o")),
                                                                 newLeaf(keys(16, 17), values("p", "q"))
                                                         )
