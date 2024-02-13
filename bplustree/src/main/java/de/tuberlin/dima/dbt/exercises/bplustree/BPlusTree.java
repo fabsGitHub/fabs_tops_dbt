@@ -256,40 +256,42 @@ public class BPlusTree {
         node.setValues(cleanValues(valueArray));
         node.setKeys(cleanKeys(keyArray));
 
+        if (cleanKeys(keyArray).length < 2) {
 
-        if (!parents.isEmpty() && parents.getLast() != null) {
-            Node[] allChildren = parents.getLast().getChildren();
-            Node[] cleanedChildren = cleanChildren(allChildren);
+            if (!parents.isEmpty() && parents.getLast() != null) {
+                Node[] allChildren = parents.getLast().getChildren();
+                Node[] cleanedChildren = cleanChildren(allChildren);
 
-            int indexOfCorrespodingChild = 0;
-            for (int i = 0; i < cleanedChildren.length; i++) {
-                if (node == cleanedChildren[i]) {
-                    indexOfCorrespodingChild = i;
-                    break;
+                int indexOfCorrespodingChild = 0;
+                for (int i = 0; i < cleanedChildren.length; i++) {
+                    if (node == cleanedChildren[i]) {
+                        indexOfCorrespodingChild = i;
+                        break;
+                    }
                 }
-            }
 
-            boolean stealingOrMergingSucced = false;
+                boolean stealingOrMergingSucced = false;
 
-            // left sibling
-            stealingOrMergingSucced = stealingFromLeftSibling(node, parents, cleanedChildren, indexOfCorrespodingChild, allChildren);
+                // left sibling
+                stealingOrMergingSucced = stealingFromLeftSibling(node, parents, cleanedChildren, indexOfCorrespodingChild, allChildren);
 
 
-            // right sibling
-            if (!stealingOrMergingSucced) {
-                stealingOrMergingSucced = stealingFromRightSibling(node, parents, cleanedChildren, indexOfCorrespodingChild, allChildren);
-            }
+                // right sibling
+                if (!stealingOrMergingSucced) {
+                    stealingOrMergingSucced = stealingFromRightSibling(node, parents, cleanedChildren, indexOfCorrespodingChild, allChildren);
+                }
 
-            if (!stealingOrMergingSucced) {
-                // In höheren parents gucken
-            }
+                if (!stealingOrMergingSucced) {
+                    // In höheren parents gucken
+                }
 
-            // Merge with sibling
-            if (!stealingOrMergingSucced && cleanKeys(node.getKeys()).length < BPlusTreeUtilities.CAPACITY / 2) {
-                if (cleanedChildren.length - 1 > indexOfCorrespodingChild) {
-                    mergeWithRightChild(node, cleanedChildren, indexOfCorrespodingChild, allChildren);
-                } else {
-                    mergeWithLeftChild(node, cleanedChildren, indexOfCorrespodingChild, allChildren);
+                // Merge with sibling
+                if (!stealingOrMergingSucced && cleanKeys(node.getKeys()).length < BPlusTreeUtilities.CAPACITY / 2) {
+                    if (cleanedChildren.length - 1 > indexOfCorrespodingChild) {
+                        mergeWithRightChild(node, cleanedChildren, indexOfCorrespodingChild, allChildren);
+                    } else {
+                        mergeWithLeftChild(node, cleanedChildren, indexOfCorrespodingChild, allChildren);
+                    }
                 }
             }
         }
@@ -321,8 +323,13 @@ public class BPlusTree {
             allChildren[indexOfCorrespodingChild - 1] = node;
 
             Integer[] newParentKeys = generateNewKeys(cleanedChildren.length, allChildren);
-            root.setKeys(cleanKeys(newParentKeys));
-            root.setPayload(allChildren);
+            if (cleanKeys(newParentKeys).length == 0){
+                root = node;
+            } else {
+                root.setKeys(cleanKeys(newParentKeys));
+                root.setPayload(allChildren);
+            }
+
         }
     }
 
@@ -358,8 +365,12 @@ public class BPlusTree {
 
 
             Integer[] newParentKeys = generateNewKeys(cleanChildren(workingChildren).length - 1, cleanChildren(workingChildren));
-            root.setKeys(cleanKeys(newParentKeys));
-            root.setPayload(cleanChildren(workingChildren));
+            if (cleanKeys(newParentKeys).length == 0){
+                root = node;
+            } else {
+                root.setKeys(cleanKeys(newParentKeys));
+                root.setPayload(workingChildren);
+            }
         }
     }
 
@@ -367,7 +378,7 @@ public class BPlusTree {
         String stealingValue;
         Integer stealingKey = null;
 
-        if (leafNods[indexOfCorrespodingChild + 1] != null) {
+        if (indexOfCorrespodingChild + 1 < leafNods.length && leafNods[indexOfCorrespodingChild + 1] != null) {
             if (leafNods.length - 1 > indexOfCorrespodingChild) {
                 LeafNode siblingChild = (LeafNode) leafNods[indexOfCorrespodingChild + 1];
                 Integer[] siblingChildKeys = cleanKeys(siblingChild.getKeys());
@@ -435,7 +446,6 @@ public class BPlusTree {
                         root.setPayload(workingNodeArray);
                         root.setKeys(newNodeKeys);
                     }
-
 
 
                 }
