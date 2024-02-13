@@ -281,10 +281,6 @@ public class BPlusTree {
                     stealingOrMergingSucced = stealingFromRightSibling(node, parents, cleanedChildren, indexOfCorrespodingChild, allChildren);
                 }
 
-                if (!stealingOrMergingSucced) {
-                    // In höheren parents gucken
-                }
-
                 // Merge with sibling
                 if (!stealingOrMergingSucced && cleanKeys(node.getKeys()).length < BPlusTreeUtilities.CAPACITY / 2) {
                     if (cleanedChildren.length - 1 > indexOfCorrespodingChild) {
@@ -327,7 +323,7 @@ public class BPlusTree {
                 root = node;
             } else {
                 root.setKeys(cleanKeys(newParentKeys));
-                root.setPayload(allChildren);
+                root.setPayload(cleanChildren(allChildren));
             }
 
         }
@@ -369,7 +365,7 @@ public class BPlusTree {
                 root = node;
             } else {
                 root.setKeys(cleanKeys(newParentKeys));
-                root.setPayload(workingChildren);
+                root.setPayload(cleanChildren(workingChildren));
             }
         }
     }
