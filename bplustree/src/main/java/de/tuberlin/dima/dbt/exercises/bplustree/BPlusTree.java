@@ -143,19 +143,25 @@ public class BPlusTree {
                 node1 = new LeafNode(keys1, values1, BPlusTreeUtilities.CAPACITY);
                 node2 = new LeafNode(keys2, values2, BPlusTreeUtilities.CAPACITY);
 
-                Node[] oldLeafNodeArray = cleanChildren(parents.getLast().getChildren());
 
                 ArrayList<Node> tempLeafNodeArray = new ArrayList<>();
 
-                for (int i = 0; i < oldLeafNodeArray.length; i++) {
-                    if (oldLeafNodeArray[i] != node) {
-                        tempLeafNodeArray.add(oldLeafNodeArray[i]);
-                    } else {
-                        tempLeafNodeArray.add(node1);
-                        tempLeafNodeArray.add(node2);
-                    }
-                }
+                if (!parents.isEmpty()) {
+                    Node[] oldLeafNodeArray = cleanChildren(parents.getLast().getChildren());
 
+                    for (int i = 0; i < oldLeafNodeArray.length; i++) {
+                        if (oldLeafNodeArray[i] != node) {
+                            tempLeafNodeArray.add(oldLeafNodeArray[i]);
+                        } else {
+                            tempLeafNodeArray.add(node1);
+                            tempLeafNodeArray.add(node2);
+                        }
+                    }
+
+                } else {
+                    tempLeafNodeArray.add(node1);
+                    tempLeafNodeArray.add(node2);
+                }
                 Node[] newLeafNodeArray1 = new Node[BPlusTreeUtilities.CAPACITY + 1];
                 Node[] newLeafNodeArray2 = new Node[BPlusTreeUtilities.CAPACITY + 1];
 
@@ -257,7 +263,12 @@ public class BPlusTree {
                     }
                 }
                 if (!isRootAlreadyUpdated) {
-                    root.setPayload(payLoadLastLast);
+                    if (root instanceof LeafNode) {
+                        root = new InnerNode(generateNewKeys(cleanChildren(payLoadLastLast).length, payLoadLastLast), payLoadLastLast, BPlusTreeUtilities.CAPACITY);
+
+                    } else {
+                        root.setPayload(payLoadLastLast);
+                    }
 
                     Integer[] rootKeys = root.getKeys();
                     if (payLoadLastLast[cleanKeys(rootKeys).length + 1] != null) {
