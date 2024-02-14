@@ -195,6 +195,7 @@ public class BPlusTree {
                 Node[] payLoadLastLast = newLeafNodeArray1;
 
                 // Versuch für beliebige Größen
+                boolean isRootAlreadyUpdated = false;
                 if (parents.size() > 1) {
 
                     boolean hasMoreElements = true;
@@ -229,16 +230,44 @@ public class BPlusTree {
                             upperInnerNode = new InnerNode(generateNewKeys(payLoadLastLast.length - 1, payLoadLastLast), payLoadLastLast, BPlusTreeUtilities.CAPACITY);
                         }
                     }
+                } else {
+                    if (tempLeafNodeArray.size() > 5) {
+                        Node[] newLeftNodeValues = new Node[BPlusTreeUtilities.CAPACITY + 1];
+                        Node[] newRightNodeValues = new Node[BPlusTreeUtilities.CAPACITY + 1];
+
+                        for (int i = 0; i < tempLeafNodeArray.size() / 2; i++) {
+                            newLeftNodeValues[i] = tempLeafNodeArray.get(i);
+                        }
+                        int k = 0;
+                        for (int j = tempLeafNodeArray.size() / 2; j < tempLeafNodeArray.size(); j++) {
+                            newRightNodeValues[k] = tempLeafNodeArray.get(j);
+                            k++;
+                        }
+
+                        Node newLeftNode = new InnerNode(generateNewKeys(cleanChildren(newLeftNodeValues).length, newLeftNodeValues), newLeftNodeValues, BPlusTreeUtilities.CAPACITY);
+                        Node newRightNode = new InnerNode(generateNewKeys(cleanChildren(newRightNodeValues).length, newRightNodeValues), newRightNodeValues, BPlusTreeUtilities.CAPACITY);
+
+
+                        Node[] workingNodeArray = new Node[BPlusTreeUtilities.CAPACITY + 1];
+                        workingNodeArray[0] = newLeftNode;
+                        workingNodeArray[1] = newRightNode;
+
+                        root = new InnerNode(generateNewKeys(cleanChildren(workingNodeArray).length - 1, cleanChildren(workingNodeArray)), workingNodeArray, BPlusTreeUtilities.CAPACITY);
+                        isRootAlreadyUpdated = true;
+                    }
+                }
+                if (!isRootAlreadyUpdated) {
+                    root.setPayload(payLoadLastLast);
+
+                    Integer[] rootKeys = root.getKeys();
+                    if (payLoadLastLast[cleanKeys(rootKeys).length + 1] != null) {
+                        Node tempNode = payLoadLastLast[cleanKeys(rootKeys).length + 1];
+                        Integer[] tempNodeKeys = tempNode.getKeys();
+                        rootKeys[cleanKeys(rootKeys).length] = tempNodeKeys[0];
+                    }
+                    root.setKeys(rootKeys);
                 }
 
-                root.setPayload(payLoadLastLast);
-                Integer[] rootKeys = root.getKeys();
-                if (payLoadLastLast[cleanKeys(rootKeys).length + 1] != null) {
-                    Node tempNode = payLoadLastLast[cleanKeys(rootKeys).length + 1];
-                    Integer[] tempNodeKeys = tempNode.getKeys();
-                    rootKeys[cleanKeys(rootKeys).length] = tempNodeKeys[0];
-                }
-                root.setKeys(rootKeys);
             }
 
             // muss drin sein, wenn node ein leafnode ist
@@ -247,6 +276,7 @@ public class BPlusTree {
 
         }
     }
+
 
     public static Node[] cleanChildren(final Node[] v) {
         List<Node> list = new ArrayList<Node>(Arrays.asList(v));
@@ -359,7 +389,8 @@ public class BPlusTree {
                     }
                 }
                 newParentKeys = oldParentKeys;
-            }if (cleanKeys(newParentKeys).length == 0) {
+            }
+            if (cleanKeys(newParentKeys).length == 0) {
                 root = node;
             } else {
 
@@ -560,7 +591,8 @@ public class BPlusTree {
                             }
                         }
                         newParentKeys = oldParentKeys;
-                    }if (cleanKeys(newParentKeys).length == 0) {
+                    }
+                    if (cleanKeys(newParentKeys).length == 0) {
                         root = node;
                     } else {
 
@@ -677,7 +709,6 @@ public class BPlusTree {
                 LeafNode newLeftChild = new LeafNode(cleanKeys(siblingChildKeys), cleanValues(siblingChildValues), BPlusTreeUtilities.CAPACITY);
                 workingNodeArray[indexOfChild] = node;
                 workingNodeArray[indexOfChild - 1] = newLeftChild;
-
 
 
                 Integer[] newNodeKeys = generateNewKeys(workingNodeArray.length - 1, workingNodeArray);
