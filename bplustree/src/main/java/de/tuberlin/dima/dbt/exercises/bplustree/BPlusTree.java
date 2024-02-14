@@ -136,8 +136,8 @@ public class BPlusTree {
                         keys1[i] = newKeyArray[i];
                         values1[i] = newValueArray[i];
                     } else {
-                        keys2[i - 2] = newKeyArray[i];
-                        values2[i - 2] = newValueArray[i];
+                        keys2[i - BPlusTreeUtilities.CAPACITY/2] = newKeyArray[i];
+                        values2[i - BPlusTreeUtilities.CAPACITY/2] = newValueArray[i];
                     }
                 }
                 node1 = new LeafNode(keys1, values1, BPlusTreeUtilities.CAPACITY);
@@ -237,7 +237,7 @@ public class BPlusTree {
                         }
                     }
                 } else {
-                    if (tempLeafNodeArray.size() > 5) {
+                    if (tempLeafNodeArray.size() > BPlusTreeUtilities.CAPACITY+1) {
                         Node[] newLeftNodeValues = new Node[BPlusTreeUtilities.CAPACITY + 1];
                         Node[] newRightNodeValues = new Node[BPlusTreeUtilities.CAPACITY + 1];
 
@@ -258,7 +258,15 @@ public class BPlusTree {
                         workingNodeArray[0] = newLeftNode;
                         workingNodeArray[1] = newRightNode;
 
-                        root = new InnerNode(generateNewKeys(cleanChildren(workingNodeArray).length - 1, cleanChildren(workingNodeArray)), workingNodeArray, BPlusTreeUtilities.CAPACITY);
+                        Integer[] rootKeys = generateNewKeys(cleanChildren(workingNodeArray).length - 1, cleanChildren(workingNodeArray));
+
+                        if (BPlusTreeUtilities.CAPACITY == 2){
+                            Node[] tempNode = (Node[]) newRightNode.getPayload();
+
+                            rootKeys[0] = tempNode[0].getKeys()[0];
+                        }
+
+                        root = new InnerNode(rootKeys, workingNodeArray, BPlusTreeUtilities.CAPACITY);
                         isRootAlreadyUpdated = true;
                     }
                 }
